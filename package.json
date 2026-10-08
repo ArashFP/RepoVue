@@ -1,0 +1,11 @@
+{
+  "name": "repovue",
+  "private": true,
+  "scripts": {
+    "db": "docker compose up -d --wait",
+    "db:stop": "docker compose stop",
+    "backend": "docker compose up -d --wait && dotnet run --project api/RepoVue.Api",
+    "frontend": "cd web && npm run dev",
+    "test": "dotnet test && cd web && npm test"
+  }
+}

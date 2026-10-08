@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# A newer push to the same branch cancels the run that's still going.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  api:
+    name: API
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        id: build
+        run: dotnet build --no-restore --configuration Release
+
+      # One step per test area, so the run page shows what passed or failed. Each step also writes
+      # its results to the job summary and marks failed tests in the code (GitHubActions logger).
+      # Testcontainers starts a real PostgreSQL per test class (GitHub's Ubuntu runners have Docker).
+      # The test steps all run even if an earlier one fails.
+      # A new test class goes into one of these filters, or it lands in "Tests: other".
+      - name: "Tests: health"
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: >-
+          dotnet test --no-build --configuration Release
+          --logger "console;verbosity=normal" --logger "GitHubActions"
+          --filter "FullyQualifiedName~.HealthTests."
+
+      - name: "Tests: other"
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: >-
+          dotnet test --no-build --configuration Release
+          --logger "console;verbosity=normal" --logger "GitHubActions"
+          --filter "FullyQualifiedName!~.HealthTests."
+
+  web:
+    name: Web
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        id: typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        if: ${{ !cancelled() && steps.typecheck.outcome == 'success' }}
+        run: npm run lint
+
+      # Vitest lists every test by name and marks failures in the code (github-actions reporter).
+      - name: Tests
+        if: ${{ !cancelled() && steps.typecheck.outcome == 'success' }}
+        run: npm test
+
+      - name: Build
+        if: ${{ !cancelled() && steps.typecheck.outcome == 'success' }}
+        run: npm run build
+
+      # Only packages that ship to the website. Dev tools (ESLint etc.) are reported by Dependabot.
+      - name: Audit production dependencies
+        if: ${{ !cancelled() }}
+        run: npm audit --omit=dev --audit-level=high
+
+  docker:
+    name: Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build API image
+        run: docker build -t repovue-api:${{ github.sha }} api/
+
+      # Fails the run on fixable HIGH or CRITICAL vulnerabilities in the image.
+      # Pinned to a commit, not a tag: a tag can be moved to different code, a commit can't.
+      - name: "Scan image for vulnerabilities (Trivy)"
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: repovue-api:${{ github.sha }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+          format: table
