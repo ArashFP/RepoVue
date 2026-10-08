@@ -1,0 +1,37 @@
+# Secrets: never commit these
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+appsettings.*.local.json
+api/**/appsettings.Development.local.json
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+web/next-env.d.ts
+*.tsbuildinfo
+npm-debug.log*
+coverage/
+playwright-report/
+test-results/
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+TestResults/
+*.trx
+
+# Editors / OS
+.vs/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Claude Code: personal, machine-specific notes
+CLAUDE.local.md
+.claude/settings.local.json
