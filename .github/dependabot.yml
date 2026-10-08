@@ -1,5 +1,7 @@
 # Dependabot opens pull requests when a dependency has an update or a known vulnerability.
 # Weekly, grouped per ecosystem, so it's one PR per area instead of one per package.
+# Minor and patch updates are grouped; each major update gets its own PR, so one breaking
+# major can't hold back the safe updates.
 version: 2
 updates:
   - package-ecosystem: npm
@@ -9,6 +11,18 @@ updates:
     groups:
       web:
         patterns: ["*"]
+        update-types: [minor, patch]
+    ignore:
+      # typescript-eslint (used by eslint-config-next) doesn't support TypeScript 7 yet:
+      # https://github.com/typescript-eslint/typescript-eslint/issues/10940
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      # eslint-config-next's plugins (import, jsx-a11y, react) only support ESLint up to 9.
+      - dependency-name: eslint
+        update-types: ["version-update:semver-major"]
+      # Types match the Node version we run on (24, in CI and nvm). Bump together with Node.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: nuget
     directory: /
@@ -17,6 +31,7 @@ updates:
     groups:
       dotnet:
         patterns: ["*"]
+        update-types: [minor, patch]
 
   - package-ecosystem: docker
     directory: /api
