@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/api/">
+    <Project Path="api/RepoVue.Api/RepoVue.Api.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/RepoVue.Api.Tests/RepoVue.Api.Tests.csproj" />
+  </Folder>
+</Solution>

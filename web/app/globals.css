@@ -1,0 +1,174 @@
+/*
+ * RepoVue global styles.
+ *
+ * Every color, size and shadow used anywhere in the app lives here as a variable.
+ * Component *.module.css files use these variables (var(--color-primary)), never their own values.
+ * Anything needed in two or more places belongs here, not copied between modules.
+ */
+
+:root {
+  /*
+   * Colors are written as light-dark(<light>, <dark>). Which one is used follows color-scheme:
+   * the system setting by default, or the user's choice via data-theme="light" / "dark" on <html>.
+   */
+  color-scheme: light dark;
+
+  /* Brand */
+  --color-primary: light-dark(#4f46e5, #818cf8);
+  --color-primary-hover: light-dark(#4338ca, #a5b4fc);
+  --color-primary-contrast: light-dark(#ffffff, #0b0d12);
+  --color-secondary: light-dark(#0d9488, #2dd4bf);
+  --color-secondary-hover: light-dark(#0f766e, #5eead4);
+  --color-secondary-contrast: light-dark(#ffffff, #0b0d12);
+
+  /* Surfaces and text */
+  --color-background: light-dark(#f7f8fa, #0b0d12);
+  --color-surface: light-dark(#ffffff, #13161d);
+  --color-surface-raised: light-dark(#ffffff, #1a1e27);
+  --color-text: light-dark(#111827, #e6e8ec);
+  --color-text-muted: light-dark(#5b6474, #9aa3b2);
+  --color-border: light-dark(#e3e6eb, #262b36);
+  --color-focus: light-dark(#6366f1, #818cf8);
+
+  /* Status (CI runs, alerts, health) */
+  --color-success: light-dark(#16a34a, #4ade80);
+  --color-success-bg: light-dark(#dcfce7, #12301f);
+  --color-warning: light-dark(#b45309, #fbbf24);
+  --color-warning-bg: light-dark(#fef3c7, #3a2c0c);
+  --color-danger: light-dark(#dc2626, #f87171);
+  --color-danger-bg: light-dark(#fee2e2, #3b1515);
+  --color-info: light-dark(#2563eb, #60a5fa);
+  --color-info-bg: light-dark(#dbeafe, #132a4a);
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Corners */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* Fonts (the font files are loaded in app/layout.tsx) */
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 32px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 600;
+  --line-height: 1.5;
+
+  /* Shadows */
+  --shadow-color: light-dark(rgb(16 24 40 / 0.08), rgb(0 0 0 / 0.45));
+  --shadow-sm: 0 1px 2px var(--shadow-color);
+  --shadow-md: 0 4px 12px var(--shadow-color);
+  --shadow-lg: 0 12px 32px var(--shadow-color);
+
+  /* Layout */
+  --sidebar-width: 240px;
+  --content-max-width: 1200px;
+  --transition-fast: 120ms ease;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* Reset and base elements */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height);
+  color: var(--color-text);
+  background: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.25;
+}
+
+h3 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code,
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Shared helpers */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
